@@ -3,7 +3,7 @@ const fs = require("fs"),
   es = require("event-stream"),
   app = express(),
   PORT = 3000,
-  masterFilePath = "master_file.txt";
+  masterFilePath = "D:/Node Projects/compute-primes/master_file.txt";
 
 app.get("/", (req, res) => {
   res.send("Url was hit");
@@ -42,10 +42,17 @@ app.get("/compute-pi/:num", (req, res) => {
               break;
             }
           }
-          const resp = doesPiExist
-            ? `The pi(${num}) is: ${result}`
-            : `The pi(${num}) doesn't exist`;
-          res.send(resp);
+          if (!doesPiExist)
+            return res.json({
+              x: null,
+              pi_x: null,
+              error: true,
+            });
+          res.send({
+            x: num,
+            pi_x: result,
+            error: false,
+          });
         })
     );
 });
