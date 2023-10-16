@@ -3,7 +3,7 @@ const fs = require("fs"),
   es = require("event-stream"),
   app = express(),
   PORT = 3000,
-  masterFilePath = "../master_file.txt";
+  masterFilePath = "master_file.txt";
 
 app.get("/", (req, res) => {
   res.send("Url was hit");
