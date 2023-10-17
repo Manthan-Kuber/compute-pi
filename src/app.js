@@ -2,22 +2,47 @@ const fs = require("fs"),
   express = require("express"),
   es = require("event-stream"),
   app = express(),
-  PORT = 3000,
-  masterFilePath = "master_file.txt";
+  PORT = 4000;
+cors = require("cors");
+
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("Url was hit");
 });
 
-app.get("/compute-pi/:num", (req, res) => {
+app.get("/get-random-numbers", (req, res) => {
+  fs.readFile("random.txt", "utf8", (err, data) => {
+    if (err) {
+      console.error("Error reading the file:", err);
+      return res.json({
+        numbers: null,
+        error: true,
+      });
+    }
+
+    const lines = data.trim().split("\n");
+
+    const numbers = lines.map((line) => parseInt(line, 10));
+
+    return res.json({
+      numbers,
+      error: false,
+    });
+
+  });
+});
+
+app.get("/compute-pi/:num/:path", (req, res) => {
   const num = req.params.num;
-  if (!num) {
-    res.send("Please send a query parameter");
+  const path = req.params.path;
+  if (!num || !path) {
+    res.send("Missing arguments");
     return;
   }
   const lines = [""];
   const s = fs
-    .createReadStream(masterFilePath)
+    .createReadStream(path)
     .pipe(es.split())
     .pipe(
       es
@@ -30,7 +55,6 @@ app.get("/compute-pi/:num", (req, res) => {
           console.log("Error:", err);
         })
         .on("end", () => {
-          lines.splice(0, 3);
           let result,
             doesPiExist = false;
           for (let i = 0; i < lines.length; i++) {
